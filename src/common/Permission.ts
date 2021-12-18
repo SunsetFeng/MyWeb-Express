@@ -11,13 +11,17 @@ type PermisionType = {
 }
 
 /**
- * 保存博客
+ * 博客权限配置
  */
-export const SAVE_BLOG = Symbol();
-
-const PermisionConfig = Object.freeze({
-  [SAVE_BLOG]:7,
+export const BLOG = Object.freeze({
+  BLOG_DRAFT:Symbol(), //草稿
 })
+/**
+ * 权限配置
+ */
+const permisionConfig = new Map<Symbol,number>([
+  [BLOG.BLOG_DRAFT,7]
+])
 
 /**
  * 初始化权限,从数据库中获取权限字段
@@ -33,13 +37,25 @@ export async function initPermision(){
         results.forEach(item => {
           permisionMap.set(item.flag,item.level);
         })
+        resolve(true);
       }
     })
-  }).catch(() => {
+  }).catch((err) => {
+    console.error(err);
     process.exit(1);
   })
 }
-
-export function checkPermision(){
-
+/**
+ * 判断权限是否满足
+ * @param flag 权限flag
+ * @param func 功能标识
+ * @returns 
+ */
+export function checkPermision(flag:string,func:Symbol):boolean{
+  let level = permisionMap.get(flag) || 0;
+  if(level < (permisionConfig.get(func) || 0)){
+    return false
+  }else{
+    return true;
+  }
 }
