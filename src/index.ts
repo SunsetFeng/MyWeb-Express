@@ -59,19 +59,18 @@ async function initFiles() {
 /**
  * 初始化
  */
-async function init() {
+export async function init() {
   //连接mysql
   await initMysql();
   //初始化权限设置
   await initPermision();
   //初始化文件夹
   await initFiles();
-
+  //监听8000端口
+  app.listen(8000);
   console.log("初始化完成");
 }
 //初始化
-init();
-//监听8000端口
-app.listen(8000);
+// init();
 //数据库连接对象
 export default dataConnection;

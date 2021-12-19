@@ -2,6 +2,7 @@
  * 部分接口需要权限,当权限不满足时,不返回响应数据
  */
 import dataConnection from "..";
+import { queryFromDatabase } from "./util";
 
 const permisionMap = new Map<string,number>();
 
@@ -27,21 +28,15 @@ const permisionConfig = new Map<Symbol,number>([
  * 初始化权限,从数据库中获取权限字段
  */
 export async function initPermision(){
-  return new Promise((resolve,reject) => {
-    dataConnection.query({
-      sql:"SELECT * FROM permission",
-    },(err,results:PermisionType[]) => {
-      if(err){
-        reject("权限值查询失败:" + err);
-      }else{
-        results.forEach(item => {
-          permisionMap.set(item.flag,item.level);
-        })
-        resolve(true);
-      }
+  queryFromDatabase<PermisionType>({
+    fields:["flag","level"],
+    table:"permission",
+  }).then(results => {
+    results.forEach(item => {
+      permisionMap.set(item.flag,item.level);
     })
-  }).catch((err) => {
-    console.error(err);
+  }).catch(err => {
+    console.error("权限值查询失败:" + err);
     process.exit(1);
   })
 }
