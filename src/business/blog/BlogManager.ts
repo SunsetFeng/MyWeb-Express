@@ -2,7 +2,7 @@ import { createWriteStream, existsSync, WriteStream } from "fs";
 import path from "path";
 import { RootDir } from "../..";
 import { ErrorCode } from "../../common/error";
-import { generateUUID, insetLineToDatabase } from "../../common/util";
+import { generateUUID, insetLineToDatabase, updateDatabase } from "../../common/util";
 
 export const DraftDir = "assets/blog/draft";
 
@@ -31,14 +31,23 @@ export default class BlogManager {
       else {
         if (!id) {
           id = generateUUID();
+          await insetLineToDatabase<{id:string,title?:string}>({
+            table:"blog_draft",
+            fields:["id","title"],
+            values:[id,title]
+          }).catch((err) => {
+            console.error("插入草稿失败:" + err);
+          })
+        }else{
+          await updateDatabase<{title?:string}>({
+              table:"blog_draft",
+              fields:["title"],
+              values:[title],
+              condition:`id='${id}'`
+          }).catch(err => {
+            console.error("更新草稿失败:" + err);
+          })
         }
-        await insetLineToDatabase<{id:string,title?:string}>({
-          table:"blog_draft",
-          fields:["id","title"],
-          values:[id,title]
-        }).catch((err) => {
-          console.error("插入草稿失败:" + err);
-        })
         let filePath = path.join(RootDir, DraftDir, `${id}.md`);
         let writeStream = this.streamMap.get(id);
         if (writeStream) {
