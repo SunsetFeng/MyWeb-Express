@@ -22,13 +22,12 @@ export default class BlogManager {
    * @param id 草稿id
    * @returns 成功返回id 失败返回code 不处理返回null
    */
-  public async saveBlogDraft(content: string,title?: string,id?: string): Promise<string | null> {
+  public async saveBlogDraft(content: string,title?: string,id?: string): Promise<string> {
     return new Promise(async (resolve, reject) => {
       if (content === "") {
         //如果需要保存的内容是空串,不做处理,因为考虑到自动保存,可能会发空串请求
-        return resolve(null);
-      }
-      else {
+        return reject([ErrorCode.ParamError,"content"])
+      }else {
         if (!id) {
           id = generateUUID();
           await insetLineToDatabase<{id:string,title?:string}>({
@@ -62,7 +61,7 @@ export default class BlogManager {
         writeStream.write(content, (err) => {
           if (err) {
             //写入失败
-            reject(ErrorCode.FileWriteFailure);
+            reject([ErrorCode.FileWriteFailure]);
           } else {
             resolve(id!);
           }

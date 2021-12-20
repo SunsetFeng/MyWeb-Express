@@ -1,7 +1,6 @@
 /**
  * 部分接口需要权限,当权限不满足时,不返回响应数据
  */
-import dataConnection from "..";
 import { queryFromDatabase } from "./util";
 
 const permisionMap = new Map<string,number>();

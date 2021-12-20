@@ -4,6 +4,8 @@ import { initPermision } from "./common/permission";
 import path from "path";
 import { promises } from "fs";
 import { DraftDir } from "./business/blog/blogManager";
+import { blogRouter } from "./router";
+import bodyParser from "body-parser";
 
 //项目根目录
 export const RootDir = path.join(__dirname,"../");
@@ -57,6 +59,16 @@ async function initFiles() {
   });
 }
 /**
+ * 初始化路由
+ */
+function initRouter(){
+  app.use(bodyParser.urlencoded({extended:false}));
+  app.use(bodyParser.json({
+    limit:1024 * 1024 * 10,  //10M大小
+  }));
+  app.use("/blog",blogRouter);
+}
+/**
  * 初始化
  */
 export async function init() {
@@ -66,11 +78,13 @@ export async function init() {
   await initPermision();
   //初始化文件夹
   await initFiles();
+  //初始化路由
+  initRouter();
   //监听8000端口
   app.listen(8000);
   console.log("初始化完成");
 }
 //初始化
-// init();
+init();
 //数据库连接对象
 export default dataConnection;
