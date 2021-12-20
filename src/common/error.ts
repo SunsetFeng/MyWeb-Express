@@ -16,6 +16,12 @@ const errorMap = new Map<ErrorCode,string>(
     [ErrorCode.ParamError,"参数错误"]
   ]
 )
+/**
+ * 构造错误返回
+ * @param code 错误Code
+ * @param extra 额外的信息
+ * @returns 
+ */
 export function makeErrorMsg(code:ErrorCode,extra?:string):string {
   let msg = errorMap.get(code) || "未知原因";
   if(extra){

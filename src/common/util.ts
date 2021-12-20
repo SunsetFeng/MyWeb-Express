@@ -1,6 +1,10 @@
 import { readFile } from "fs/promises";
 import dataConnection from "..";
 
+/**
+ * 获取UUID
+ * @returns 
+ */
 export function generateUUID() {
   let d = new Date().getTime();
   const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -76,7 +80,11 @@ export function insetLineToDatabase<T extends Record<string, any>>(option: {
     })
   })
 }
-
+/**
+ * 更新表中的数据
+ * @param option 配置
+ * @returns 
+ */
 export function updateDatabase<T extends Record<string, any>>(option: {
   table: string, //表名
   fields: Array<keyof T>,  //字段数组

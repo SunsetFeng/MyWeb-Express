@@ -19,8 +19,10 @@ export default class BlogManager {
   private streamMap = new Map<string, WriteStream>();
   /**
    * 保存草稿
+   * @param content 内容
+   * @param title 标题
    * @param id 草稿id
-   * @returns 成功返回id 失败返回code 不处理返回null
+   * @returns 成功返回id 失败返回code
    */
   public async saveBlogDraft(content: string,title?: string,id?: string): Promise<string> {
     return new Promise(async (resolve, reject) => {

@@ -62,10 +62,13 @@ async function initFiles() {
  * 初始化路由
  */
 function initRouter(){
+  //不使用扩展
   app.use(bodyParser.urlencoded({extended:false}));
+  //只支持json 内容大小最多10M 默认100K 因为博客 可能会很大 10M应该够了
   app.use(bodyParser.json({
     limit:1024 * 1024 * 10,  //10M大小
   }));
+  //博客路由
   app.use("/blog",blogRouter);
 }
 /**
