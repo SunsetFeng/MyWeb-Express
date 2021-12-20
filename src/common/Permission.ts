@@ -53,3 +53,12 @@ export function checkPermision(flag:string,func:Symbol):boolean{
     return true;
   }
 }
+/**
+ * 获取权限等级
+ * @param flag 权限flag
+ * @returns 
+ */
+export function getPermission(flag:string):number {
+  let level = permisionMap.get(flag) || 0;
+  return level;
+}
