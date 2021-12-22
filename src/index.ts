@@ -2,7 +2,7 @@ import mysql from "mysql";
 import express from "express";
 import path from "path";
 import { promises } from "fs";
-import { blogRouter } from "./router";
+import appRouter, { blogRouter } from "./router";
 import bodyParser from "body-parser";
 import { DraftDir } from "./business/blog/blogManager";
 import { initPermision } from "./common/permission";
@@ -68,6 +68,8 @@ function initRouter(){
   app.use(bodyParser.json({
     limit:1024 * 1024 * 10,  //10M大小
   }));
+  //应用全局路由
+  app.use("/",appRouter);
   //博客路由
   app.use("/blog",blogRouter);
 }
