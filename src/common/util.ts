@@ -1,5 +1,6 @@
 import { readFile } from "fs/promises";
 import dataConnection from "..";
+import { ErrorCode } from "./error";
 
 /**
  * 获取UUID
@@ -119,10 +120,12 @@ export function updateDatabase<T extends Record<string, any>>(option: {
  * 获取文件内容
  * @param filePath 文件路径
  */
-export function readFileContent(filePath: string): Promise<string | Error> {
-  return readFile(filePath).then(buffer => {
-    return buffer.toString();
-  }).catch(err => {
-    return new Error(err);
-  });
+export function readFileContent(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    readFile(filePath).then(buffer => {
+      resolve(buffer.toString())
+    }).catch(() => {
+      reject(ErrorCode.FileReadFailure);
+    });
+  })
 }

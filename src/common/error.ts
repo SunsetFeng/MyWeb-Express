@@ -7,13 +7,17 @@ export enum ErrorCode {
   FileWriteFailure, //文件写入失败 
   CreateFileFailure, //创建文件失败
   ParamError,  //参数错误
+  DatabaseReadError, //读取数据库数据失败
+  FileReadFailure,  //读文件失败
 }
 const errorMap = new Map<ErrorCode,string>(
   [
     [ErrorCode.Perrsion,"权限不足"],
     [ErrorCode.FileWriteFailure,"文件写入失败"],
     [ErrorCode.CreateFileFailure,"文件目录创建失败"],
-    [ErrorCode.ParamError,"参数错误"]
+    [ErrorCode.ParamError,"参数错误"],
+    [ErrorCode.DatabaseReadError,"读取数据库数据失败"],
+    [ErrorCode.FileReadFailure,"读取文件失败"],
   ]
 )
 /**

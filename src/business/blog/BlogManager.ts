@@ -2,7 +2,8 @@ import { createWriteStream, existsSync, WriteStream } from "fs";
 import path from "path";
 import { RootDir } from "../..";
 import { ErrorCode } from "../../common/error";
-import { generateUUID, insetLineToDatabase, updateDatabase } from "../../common/util";
+import { generateUUID, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
+import { BlogContentItem } from "../../router";
 
 export const DraftDir = "assets/blog/draft";
 
@@ -24,27 +25,27 @@ export default class BlogManager {
    * @param id 草稿id
    * @returns 成功返回id 失败返回code
    */
-  public async saveBlogDraft(content: string,title?: string,id?: string): Promise<string> {
+  public async saveBlogDraft(content: string, title?: string, id?: string): Promise<string> {
     return new Promise(async (resolve, reject) => {
       if (content === "") {
         //如果需要保存的内容是空串,不做处理,因为考虑到自动保存,可能会发空串请求
-        return reject([ErrorCode.ParamError,"content"])
-      }else {
+        return reject([ErrorCode.ParamError, "content"])
+      } else {
         if (!id) {
           id = generateUUID();
-          await insetLineToDatabase<{id:string,title?:string}>({
-            table:"blog_draft",
-            fields:["id","title"],
-            values:[id,title]
+          await insetLineToDatabase<{ id: string, title?: string }>({
+            table: "blog_draft",
+            fields: ["id", "title"],
+            values: [id, title]
           }).catch((err) => {
             console.error("插入草稿失败:" + err);
           })
-        }else{
-          await updateDatabase<{title?:string}>({
-              table:"blog_draft",
-              fields:["title"],
-              values:[title],
-              condition:`id='${id}'`
+        } else {
+          await updateDatabase<{ title?: string }>({
+            table: "blog_draft",
+            fields: ["title"],
+            values: [title],
+            condition: `id='${id}'`
           }).catch(err => {
             console.error("更新草稿失败:" + err);
           })
@@ -70,6 +71,39 @@ export default class BlogManager {
           writeStream?.end();
         });
       }
+    })
+  }
+  /**
+   * 获取草稿数据
+   * @returns 
+   */
+  public async getBlogContent(id?:string): Promise<BlogContentItem[]> {
+    let blogContents:BlogContentItem[] = [];
+    return new Promise((resolve, reject) => {
+      queryFromDatabase<{ id: string, title: string }>({
+        table: "blog_draft",
+        fields: '*',
+        condition:id ? `id='${id}'` : undefined
+      }).then(res => {
+        Promise.all(res.map((val,index) => {
+          let filePath = path.join(RootDir, DraftDir, `${val.id}.md`);
+          return readFileContent(filePath).then(content => {
+            //正常读取
+            blogContents[index] = Object.assign(res[index],{
+              content
+            } as BlogContentItem);
+          }).catch(() => {
+            //异常读取
+            blogContents[index] = Object.assign(res[index],{
+              content:""
+            } as BlogContentItem);
+          })
+        })).then(() => {
+          resolve(blogContents);
+        })
+      }).catch(() => {
+        reject(ErrorCode.DatabaseReadError);
+      })
     })
   }
 }
