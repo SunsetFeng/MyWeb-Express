@@ -13,14 +13,12 @@ type PermisionType = {
 /**
  * 博客权限配置
  */
-export const BLOG = Object.freeze({
-  BLOG_DRAFT:Symbol(), //草稿
-})
+export const BLOG = Symbol("BLOG");
 /**
  * 权限配置
  */
 const permisionConfig = new Map<Symbol,number>([
-  [BLOG.BLOG_DRAFT,7]
+  [BLOG,7]
 ])
 
 /**

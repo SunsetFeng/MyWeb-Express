@@ -1,9 +1,10 @@
 import { createWriteStream, existsSync, WriteStream } from "fs";
+import { rm } from "fs/promises";
 import path from "path";
 import { RootDir } from "../..";
 import { ErrorCode } from "../../common/error";
-import { generateUUID, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
-import { BlogContentItem } from "../../router";
+import { deleteDatabase, generateUUID, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
+import { BlogCategory, BlogContentItem, BlogData } from "../../router";
 
 export const DraftDir = "assets/blog/draft";
 
@@ -77,30 +78,81 @@ export default class BlogManager {
    * 获取草稿数据
    * @returns 
    */
-  public async getBlogContent(id?:string): Promise<BlogContentItem[]> {
-    let blogContents:BlogContentItem[] = [];
+  public getBlogContent(id?: string): Promise<BlogContentItem[]> {
+    let blogContents: BlogContentItem[] = [];
     return new Promise((resolve, reject) => {
       queryFromDatabase<{ id: string, title: string }>({
         table: "blog_draft",
         fields: '*',
-        condition:id ? `id='${id}'` : undefined
+        condition: id ? `id='${id}'` : undefined
       }).then(res => {
-        Promise.all(res.map((val,index) => {
+        Promise.all(res.map((val, index) => {
           let filePath = path.join(RootDir, DraftDir, `${val.id}.md`);
           return readFileContent(filePath).then(content => {
             //正常读取
-            blogContents[index] = Object.assign(res[index],{
+            blogContents[index] = Object.assign(res[index], {
               content
             } as BlogContentItem);
           }).catch(() => {
             //异常读取
-            blogContents[index] = Object.assign(res[index],{
-              content:""
+            blogContents[index] = Object.assign(res[index], {
+              content: ""
             } as BlogContentItem);
           })
         })).then(() => {
           resolve(blogContents);
         })
+      }).catch(() => {
+        reject(ErrorCode.DatabaseReadError);
+      })
+    })
+  }
+  /**
+   * 删除草稿
+   * @param id 草稿id
+   */
+  public deleteBlogDraft(id: string): Promise<Boolean> {
+    return new Promise((resolve, reject) => {
+      if (!id) {
+        reject(ErrorCode.ParamError)
+      } else {
+        deleteDatabase({
+          table: "blog_draft",
+          condition: `id='${id}'`,
+        }).then(() => {
+          //数据库删除成功
+          let filePath = path.join(RootDir, DraftDir, `${id}.md`);
+          rm(filePath).then(() => {
+            resolve(true)
+          }).catch(() => {
+            reject(ErrorCode.FileDeleteFailure)
+          })
+        }).catch(() => {
+          reject(ErrorCode.DatabaseDeleteError)
+        })
+      }
+    })
+  }
+  /**
+   * 获取博客分类数据
+   * @returns 
+   */
+  public getCategoryData(): Promise<BlogCategory> {
+    return new Promise((resolve, reject) => {
+      queryFromDatabase<{ category: string }>({
+        table: "blog_content",
+        fields: ["category"]
+      }).then(res => {
+        let categoryData:Record<string,number> = {};
+        res.forEach(val => {
+          if (categoryData[val.category]) {
+            let num = categoryData[val.category];
+            categoryData[val.category] = ++num;
+          } else {
+            categoryData[val.category] = 1;
+          }
+        });
+        resolve(categoryData);
       }).catch(() => {
         reject(ErrorCode.DatabaseReadError);
       })

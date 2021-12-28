@@ -9,6 +9,8 @@ export enum ErrorCode {
   ParamError,  //参数错误
   DatabaseReadError, //读取数据库数据失败
   FileReadFailure,  //读文件失败
+  FileDeleteFailure,   //文件删除失败
+  DatabaseDeleteError,   //数据库删除失败
 }
 const errorMap = new Map<ErrorCode,string>(
   [
@@ -18,6 +20,8 @@ const errorMap = new Map<ErrorCode,string>(
     [ErrorCode.ParamError,"参数错误"],
     [ErrorCode.DatabaseReadError,"读取数据库数据失败"],
     [ErrorCode.FileReadFailure,"读取文件失败"],
+    [ErrorCode.FileDeleteFailure,"文件删除失败"],
+    [ErrorCode.DatabaseDeleteError,"数据库删除数据失败"]
   ]
 )
 /**

@@ -51,6 +51,27 @@ export function queryFromDatabase<T extends Record<string, any>>(option: {
   })
 }
 /**
+ * 删除数据
+ * @param option 
+ */
+export function deleteDatabase(option: {
+  table: string,  //表名
+  condition: string  //条件
+}): Promise<Boolean> {
+  let { table, condition } = option;
+  return new Promise((resolve, reject) => {
+    dataConnection.query({
+      sql: `DELETE FROM ${table} WHERE ${condition}`
+    }, (err) => {
+      if (err) {
+        reject(false);
+      } else {
+        resolve(true);
+      }
+    })
+  })
+}
+/**
  * 插入一行数据
  * @param option 配置
  * @returns 
