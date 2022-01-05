@@ -4,9 +4,10 @@ import path from "path";
 import { RootDir } from "../..";
 import { ErrorCode } from "../../common/error";
 import { deleteDatabase, generateUUID, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
-import { BlogCategory, BlogContentItem, BlogData } from "../../router";
+import { BlogActionReq, BlogCategory, BlogContentItem, BlogData } from "../../router";
 
 export const DraftDir = "assets/blog/draft";
+export const BlogDir = "assets/blog/content";
 
 export default class BlogManager {
   //博客管理器---单例
@@ -26,7 +27,7 @@ export default class BlogManager {
    * @param id 草稿id
    * @returns 成功返回id 失败返回code
    */
-  public async saveBlogDraft(content: string, title?: string, id?: string): Promise<string> {
+  public saveBlogDraft(content: string, title?: string, id?: string): Promise<string> {
     return new Promise(async (resolve, reject) => {
       if (content === "") {
         //如果需要保存的内容是空串,不做处理,因为考虑到自动保存,可能会发空串请求
@@ -143,19 +144,74 @@ export default class BlogManager {
         table: "blog_content",
         fields: ["category"]
       }).then(res => {
-        let categoryData:Record<string,number> = {};
+        let categoryData: Record<string, number> = {};
         res.forEach(val => {
-          if (categoryData[val.category]) {
-            let num = categoryData[val.category];
-            categoryData[val.category] = ++num;
-          } else {
-            categoryData[val.category] = 1;
-          }
+          let categorys = val.category.split(",");
+          categorys.forEach(category => {
+            if (categoryData[category]) {
+              let num = categoryData[category];
+              categoryData[category] = ++num;
+            } else {
+              categoryData[category] = 1;
+            }
+          })
         });
         resolve(categoryData);
       }).catch(() => {
         reject(ErrorCode.DatabaseReadError);
       })
+    })
+  }
+  /**
+   * 发布博客
+   * @param title 标题
+   * @param content 内容
+   * @param category 分类
+   * @param id id 有id代表是从草稿转为博客发布 因此需要删除草稿
+   */
+  public releaseBlog(title: string, content: string, category: string[], id?: string): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      if (title === "" || content === "" || category.length === 0) {
+        reject(ErrorCode.ParamError);
+      } else {
+        if (!id) {
+          id = generateUUID();
+        }
+        await insetLineToDatabase<{ id: string, title: string, category: string }>({
+          table: "blog_content",
+          fields: ["id", "title", "category"],
+          values: [id, title, category.toString()]
+        }).catch((err) => {
+          console.error("保存博客失败:" + err);
+        });
+        let filePath = path.join(RootDir, BlogDir, `${id}.md`);
+        let writeStream = this.streamMap.get(id);
+        if (writeStream) {
+          //如果上一个还未关闭,则结束掉
+          writeStream.end();
+        }
+        //创建新流
+        writeStream = createWriteStream(filePath);
+        //保存流
+        this.streamMap.set(id, writeStream);
+        //写入数据
+        writeStream.write(content, (err) => {
+          if (err) {
+            //写入失败
+            reject(ErrorCode.FileWriteFailure);
+          } else {
+            resolve(id!);
+            //写入成功后尝试删除草稿(有,则删除)
+            deleteDatabase({
+              table: "blog_draft",
+              condition: `id='${id}'`,
+            });
+            let filePath = path.join(RootDir, DraftDir, `${id}.md`);
+            rm(filePath, { force: true })
+          }
+          writeStream?.end();
+        });
+      }
     })
   }
 }

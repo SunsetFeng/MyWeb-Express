@@ -4,7 +4,7 @@ import path from "path";
 import { promises } from "fs";
 import appRouter, { blogRouter } from "./router";
 import bodyParser from "body-parser";
-import { DraftDir } from "./business/blog/blogManager";
+import { BlogDir, DraftDir } from "./business/blog/blogManager";
 import { initPermision } from "./common/permission";
 
 //项目根目录
@@ -44,8 +44,10 @@ async function initMysql() {
  */
 async function initFiles() {
   let draft = path.join(RootDir, DraftDir);
+  let blog = path.join(RootDir,BlogDir);
   let dirArr:Array<[string,string]> = [
     [draft,"博客草稿"],
+    [blog,"博客内容"]
   ]
   let promiseArr =  dirArr.map(item => {
     promises.mkdir(item[0], {

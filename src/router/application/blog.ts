@@ -29,15 +29,16 @@ export type BlogContentItem = {
 };
 //博客操作类型
 enum BlogOpreaType {
-  RELEASE,
-  DELETE
+  RELEASE,  //发布
+  DELETE  //删除
 }
-
-type BlogActionReq = {
+//博客操作请求
+export type BlogActionReq = {
   id?: string;  //是否有id
   type: BlogOpreaType  //操作类型
   title: string,  //标题
   content: string  //内容
+  category: string[]  //分类
 }
 
 export type BlogData = {
@@ -102,7 +103,7 @@ blogRouter.post("/permission/draft/items", function (req, res) {
     res.end(makeErrorMsg(errCode));
   })
 })
-//博客内容
+//博客分类内容
 blogRouter.post("/category", function (req, res) {
   BlogManager.Instance.getCategoryData().then(data => {
     res.end(JSON.stringify(data));
@@ -110,11 +111,16 @@ blogRouter.post("/category", function (req, res) {
     res.end(makeErrorMsg(err));
   })
 })
-//博客操作
+//博客操作 发布或者删除
 blogRouter.post("/permission/action", function (req, res) {
-  let body = req.body;
+  let body: BlogActionReq = req.body;
   if (body.type === BlogOpreaType.RELEASE) {
     //发布
+    BlogManager.Instance.releaseBlog(body.title, body.content, body.category, body.id).then(id => {
+      res.end(JSON.stringify({id}));
+    }).catch((errCode: ErrorCode) => {
+      res.end(makeErrorMsg(errCode));
+    })
   } else if (body.type === BlogOpreaType.DELETE) {
     //删除
   }
