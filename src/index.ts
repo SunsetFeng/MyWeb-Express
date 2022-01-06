@@ -6,6 +6,7 @@ import appRouter, { blogRouter } from "./router";
 import bodyParser from "body-parser";
 import { BlogDir, DraftDir } from "./business/blog/blogManager";
 import { initPermision } from "./common/permission";
+import { Mgr } from "./common/manager";
 
 //项目根目录
 export const RootDir = path.join(__dirname,"../");
@@ -87,6 +88,8 @@ export async function init() {
   await initFiles();
   //初始化路由
   initRouter();
+  //初始化管理器
+  Mgr.init();
   //监听8000端口
   app.listen(8000);
   console.log("初始化完成");
