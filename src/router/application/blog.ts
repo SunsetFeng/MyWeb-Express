@@ -111,5 +111,5 @@ blogRouter.post("/permission/action", function (req, res) {
 blogRouter.post("/category/content", function (req, res) {
   let category = req.body.category;
   let data = Mgr.blogMgr.getBlogDatasByCatgory(category);
-  res.end(data);
+  res.end(JSON.stringify(data));
 })
