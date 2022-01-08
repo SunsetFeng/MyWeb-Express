@@ -113,3 +113,8 @@ blogRouter.post("/category/content", function (req, res) {
   let data = Mgr.blogMgr.getBlogDatasByCatgory(category);
   res.end(JSON.stringify(data));
 })
+blogRouter.post("/content", function (req, res) {
+  let id = req.body.id;
+  let data = Mgr.blogMgr.getBlogDataById(id);
+  res.end(JSON.stringify(data));
+})

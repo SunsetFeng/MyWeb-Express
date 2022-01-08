@@ -165,8 +165,8 @@ export default class BlogManager {
     let categoryData: BlogCategoryData[] = [];
     for (let [key, item] of this.categoryMap) {
       categoryData.push({
-        category:key,
-        num:item.length
+        category: key,
+        num: item.length
       })
     }
     return categoryData;
@@ -227,7 +227,8 @@ export default class BlogManager {
               condition: `id='${id}'`,
             });
             let filePath = path.join(RootDir, DraftDir, `${id}.md`);
-            rm(filePath, { force: true })
+            rm(filePath, { force: true });
+            this.draftMap.delete(id!);
           }
           writeStream?.end();
         });
@@ -240,6 +241,13 @@ export default class BlogManager {
    */
   public getBlogDatasByCatgory(category: string): BlogData[] {
     return this.categoryMap.get(category)!;
+  }
+  /**
+   * 根据id获取博客数据
+   * @param id 
+   */
+  public getBlogDataById(id: string): BlogData {
+    return this.blogMap.get(id)!;
   }
   /**
    * 添加到分类map
