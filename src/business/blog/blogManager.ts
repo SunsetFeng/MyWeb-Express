@@ -53,6 +53,17 @@ export default class BlogManager {
     this.init();
   }
   /**
+   * 是否存在这个博客
+   * @param id 
+   * @returns 
+   */
+  public hasBlog(id: string): boolean {
+    if (this.blogMap.has(id)) {
+      return true;
+    }
+    return false;
+  }
+  /**
    * 保存草稿
    * @param content 内容
    * @param title 标题
@@ -71,17 +82,20 @@ export default class BlogManager {
             table: "blog_draft",
             fields: ["id", "title"],
             values: [id, title]
-          }).catch((err) => {
-            console.error("插入草稿失败:" + err);
+          }).catch(() => {
+            return reject([ErrorCode.DatabaseReadError, "写入草稿失败"])
           })
         } else {
+          if (!this.draftMap.has(id)) {
+            return reject([ErrorCode.ParamError, "不存在的id"]);
+          }
           await updateDatabase<{ title?: string }>({
             table: "blog_draft",
             fields: ["title"],
             values: [title],
             condition: `id='${id}'`
           }).catch(err => {
-            console.error("更新草稿失败:" + err);
+            return reject([ErrorCode.DatabaseReadError, "更新草稿失败"])
           })
         }
         let filePath = path.join(RootDir, DraftDir, `${id}.md`);
@@ -98,9 +112,9 @@ export default class BlogManager {
         writeStream.write(content, (err) => {
           if (err) {
             //写入失败
-            reject([ErrorCode.FileWriteFailure]);
+            return reject([ErrorCode.FileWriteFailure, "写入文件失败"]);
           } else {
-            writeStream?.end();
+            this.streamMap.delete(id!);
             //加入map
             let oldData = this.draftMap.get(id!) || {};
             let newData = Object.assign(oldData, {
@@ -109,7 +123,7 @@ export default class BlogManager {
               content
             });
             this.draftMap.set(id!, newData);
-            resolve(id!);
+            return resolve(id!);
           }
         });
       }
@@ -137,7 +151,7 @@ export default class BlogManager {
   public deleteBlogDraft(id: string): Promise<Boolean> {
     return new Promise((resolve, reject) => {
       if (!id) {
-        reject(ErrorCode.ParamError)
+        reject([ErrorCode.ParamError, "id"])
       } else {
         deleteDatabase({
           table: "blog_draft",
@@ -149,10 +163,10 @@ export default class BlogManager {
             this.draftMap.delete(id);
             resolve(true);
           }).catch(() => {
-            reject(ErrorCode.FileDeleteFailure)
+            reject([ErrorCode.FileDeleteFailure, "删除草稿文件失败"])
           })
         }).catch(() => {
-          reject(ErrorCode.DatabaseDeleteError)
+          reject([ErrorCode.DatabaseDeleteError, "删除数据库草稿失败"])
         })
       }
     })
@@ -181,7 +195,7 @@ export default class BlogManager {
   public releaseBlog(title: string, content: string, category: string[], id?: string): Promise<string> {
     return new Promise(async (resolve, reject) => {
       if (title === "" || content === "" || category.length === 0) {
-        reject(ErrorCode.ParamError);
+        reject([ErrorCode.ParamError]);
       } else {
         if (!id) {
           id = generateUUID();
@@ -190,8 +204,8 @@ export default class BlogManager {
           table: "blog_content",
           fields: ["id", "title", "category"],
           values: [id, title, category.toString()]
-        }).catch((err) => {
-          console.error("保存博客失败:" + err);
+        }).catch(() => {
+          return reject([ErrorCode.DatabaseWriteError, "保存博客失败"])
         });
         let filePath = path.join(RootDir, BlogDir, `${id}.md`);
         let writeStream = this.streamMap.get(id);
@@ -207,7 +221,7 @@ export default class BlogManager {
         writeStream.write(content, (err) => {
           if (err) {
             //写入失败
-            reject(ErrorCode.FileWriteFailure);
+            return reject([ErrorCode.FileWriteFailure, "博客文件写入失败"]);
           } else {
             //博客数据
             let blogData: BlogData = {
@@ -220,7 +234,6 @@ export default class BlogManager {
             this.blogMap.set(id!, blogData);
             //添加到分类map
             this.addToCategory(category, blogData);
-            resolve(id!);
             //写入成功后尝试删除草稿(有,则删除)
             deleteDatabase({
               table: "blog_draft",
@@ -228,10 +241,94 @@ export default class BlogManager {
             });
             let filePath = path.join(RootDir, DraftDir, `${id}.md`);
             rm(filePath, { force: true });
+            //从草稿移除
             this.draftMap.delete(id!);
+            resolve(id!);
           }
-          writeStream?.end();
+          this.streamMap.delete(id!);
         });
+      }
+    })
+  }
+  /**
+   * 删除博客
+   * @param id 
+   */
+  public deleteBlog(id: string): Promise<Boolean> {
+    return new Promise((resolve, reject) => {
+      if (!id) {
+        reject([ErrorCode.ParamError, "id"]);
+      } else {
+        deleteDatabase({
+          table: "blog_content",
+          condition: `id='${id}'`
+        }).then(() => {
+          //数据库删除成功
+          let filePath = path.join(RootDir, BlogDir, `${id}.md`);
+          rm(filePath).then(() => {
+            //文件删除成功,从map中移除
+            let blogData = this.blogMap.get(id)!;
+            this.blogMap.delete(id);
+            this.removeFromCategory(blogData);
+            resolve(true);
+          }).catch(() => {
+            reject([ErrorCode.FileDeleteFailure, "文件删除失败"]);
+          })
+        })
+      }
+    })
+  }
+  /**
+   * 更新博客数据
+   * @param id 
+   * @param title 
+   * @param content 
+   * @param category 
+   * @returns 
+   */
+  public modifyBlog(id: string, title?: string, content?: string, category?: string[]): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (!id) {
+        reject([ErrorCode.ParamError]);
+      } else {
+        let curBlogData = this.blogMap.get(id)!;
+        let nextTitle = title || curBlogData.title;
+        let nextCategory = category?.toString() || curBlogData.category.toString();
+        updateDatabase({
+          table: "blog_content",
+          fields: ["title", "category"],
+          values: [nextTitle, nextCategory],
+          condition: `id='${id}'`
+        });
+        if (content) {
+          let filePath = path.join(RootDir, BlogDir, `${id}.md`);
+          let writeStream = this.streamMap.get(id);
+          if (writeStream) {
+            //如果上一个还未关闭,则结束掉
+            writeStream.end();
+          }
+          //创建新流
+          writeStream = createWriteStream(filePath);
+          //保存流
+          this.streamMap.set(id, writeStream);
+          //写入数据
+          writeStream.write(content, (err) => {
+            if (err) {
+              //写入失败
+              reject([ErrorCode.FileWriteFailure,"更新博客文件失败"]);
+            } else {
+              let blogData = this.blogMap.get(id)!;
+              //更新分类map
+              this.removeFromCategory(blogData);
+              blogData.category = category || blogData.category;
+              blogData.title = nextTitle;
+              blogData.content = content || blogData.content;
+              this.addToCategory(blogData.category,blogData);
+            }
+            this.streamMap.delete(id);
+            resolve(true);
+          });
+        }
       }
     })
   }
@@ -265,6 +362,23 @@ export default class BlogManager {
     })
   }
   /**
+   * 从分类map中移除
+   * @param blogData 
+   */
+  private removeFromCategory(blogData: BlogData) {
+    let categorys = blogData.category;
+    for (let i = 0; i < categorys.length; i++) {
+      let blogDatas = this.categoryMap.get(categorys[i])!;
+      let index = blogDatas.findIndex((val) => {
+        return val === blogData;
+      });
+      blogDatas.splice(index, 1);
+      if(blogDatas.length === 0){
+        this.categoryMap.delete(categorys[i]);
+      }
+    }
+  }
+  /**
    * 初始读取草稿数据
    */
   private readDraftData(): Promise<Boolean> {
@@ -291,7 +405,7 @@ export default class BlogManager {
           resolve(true);
         })
       }).catch(() => {
-        reject(ErrorCode.DatabaseReadError);
+        reject([ErrorCode.DatabaseReadError,"读取草稿数据失败"]);
       })
     })
   }
@@ -328,7 +442,7 @@ export default class BlogManager {
           resolve(true);
         })
       }).catch(() => {
-        reject(ErrorCode.DatabaseReadError);
+        reject([ErrorCode.DatabaseReadError,"读取博客数据失败"]);
       })
     })
   }

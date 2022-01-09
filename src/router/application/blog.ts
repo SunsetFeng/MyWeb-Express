@@ -24,7 +24,7 @@ type BlogDraftBack = {
 //博客操作类型
 enum BlogOpreaType {
   RELEASE,  //发布
-  DELETE  //删除
+  DELETE,  //删除
 }
 //博客操作请求
 export type BlogActionReq = {
@@ -74,8 +74,8 @@ blogRouter.post("/permission/draft/action", function (req, res) {
         msg: "博客删除成功",
         id
       } as BlogDraftBack));
-    }).catch((err: ErrorCode) => {
-      res.end(makeErrorMsg(err));
+    }).catch((err: [ErrorCode, string]) => {
+      res.end(makeErrorMsg(err[0], err[1]));
     })
   }
 })
@@ -95,14 +95,28 @@ blogRouter.post("/category/blogSize", function (req, res) {
 blogRouter.post("/permission/action", function (req, res) {
   let body: BlogActionReq = req.body;
   if (body.type === BlogOpreaType.RELEASE) {
-    //发布
-    Mgr.blogMgr.releaseBlog(body.title, body.content, body.category, body.id).then(id => {
-      res.end(JSON.stringify({ id }));
-    }).catch((errCode: ErrorCode) => {
-      res.end(makeErrorMsg(errCode));
-    })
+    if (Mgr.blogMgr.hasBlog(body.id!)) {
+      //修改
+      Mgr.blogMgr.modifyBlog(body.id!, body.title, body.content, body.category).then(status => {
+        res.end(JSON.stringify({ status, id: body.id }));
+      }).catch((err: [ErrorCode, string]) => {
+        res.end(makeErrorMsg(err[0], err[1]));
+      })
+    } else {
+      //发布
+      Mgr.blogMgr.releaseBlog(body.title, body.content, body.category, body.id).then(id => {
+        res.end(JSON.stringify({ id, status: true }));
+      }).catch((err: [ErrorCode, string]) => {
+        res.end(makeErrorMsg(err[0], err[1]));
+      })
+    }
   } else if (body.type === BlogOpreaType.DELETE) {
     //删除
+    Mgr.blogMgr.deleteBlog(body.id!).then((status) => {
+      res.end(JSON.stringify({ status }))
+    }).catch((err: [ErrorCode, string]) => {
+      res.end(makeErrorMsg(err[0], err[1]));
+    })
   }
 });
 /**
@@ -113,6 +127,9 @@ blogRouter.post("/category/content", function (req, res) {
   let data = Mgr.blogMgr.getBlogDatasByCatgory(category);
   res.end(JSON.stringify(data));
 })
+/**
+ * 获取博客内容数据
+ */
 blogRouter.post("/content", function (req, res) {
   let id = req.body.id;
   let data = Mgr.blogMgr.getBlogDataById(id);

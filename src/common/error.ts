@@ -11,6 +11,7 @@ export enum ErrorCode {
   FileReadFailure,  //读文件失败
   FileDeleteFailure,   //文件删除失败
   DatabaseDeleteError,   //数据库删除失败
+  DatabaseWriteError,  //数据库写入失败
 }
 const errorMap = new Map<ErrorCode,string>(
   [
@@ -21,7 +22,8 @@ const errorMap = new Map<ErrorCode,string>(
     [ErrorCode.DatabaseReadError,"读取数据库数据失败"],
     [ErrorCode.FileReadFailure,"读取文件失败"],
     [ErrorCode.FileDeleteFailure,"文件删除失败"],
-    [ErrorCode.DatabaseDeleteError,"数据库删除数据失败"]
+    [ErrorCode.DatabaseDeleteError,"数据库删除数据失败"],
+    [ErrorCode.DatabaseWriteError,"数据库写入数据失败"],
   ]
 )
 /**
@@ -37,7 +39,7 @@ export function makeErrorMsg(code:ErrorCode,extra?:string):string {
   }
   let errorMsg = JSON.stringify({
     msg,
-    stats:false
+    status:false
   });
   return errorMsg;
 }
