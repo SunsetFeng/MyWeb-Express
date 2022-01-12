@@ -1,30 +1,30 @@
 Arguments: 
-  D:\node.exe D:\nodejs\node_global\node_modules\yarn\bin\yarn.js add bodybody-parser
+  C:\Program Files\nodejs\node.exe C:\Users\86180\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @types/connect-multiparty --dev
 
 PATH: 
-  C:\Python27\;C:\Python27\Scripts;C:\Program Files\AdoptOpenJDK\jdk-11.0.11.9-hotspot\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Users\admin\AppData\Local\Yarn\Data\global\node_modules\.bin;D:\electron\elctron-vue\demo\node_modules\.bin\;C:\Program Files (x86)\NetSarang\Xshell 7\;C:\Program Files (x86)\NetSarang\Xftp 7\;C:\Users\admin\AppData\Roaming\npm\;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;D:\;C:\Users\admin\AppData\Local\Microsoft\WindowsApps;C:\Users\admin\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\admin\Documents\JDK8_64\JDK8_64\bin;C:\Users\admin\Documents\JDK8_64\JDK8_64\jre\bin;C:\Users\admin\Downloads\apache-maven-3.3.9-bin\apache-maven-3.3.9\bin;C:\Users\admin\Downloads\mysql-8.0.20-winx64\mysql-8.0.20-winx64\bin;D:\nodejs\node_global\node_modules;D:\nodejs\node_global;C:\Users\admin\AppData\Roaming\npm
+  C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\libexec\git-core;C:\Program Files\Git\bin;C:\Python27;C:\Program Files\nodejs\;E:\WinSCP\;E:\mysql\bin;C:\Users\86180\AppData\Local\Microsoft\WindowsApps;C:\Microsoft VS Code\bin;C:\Users\86180\AppData\Local\Yarn\bin\;C:\Users\86180\AppData\Roaming\npm
 
 Yarn version: 
-  1.22.5
+  1.22.17
 
 Node version: 
-  14.18.2
+  16.11.0
 
 Platform: 
   win32 x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/bodybody-parser: Not found
-      at Request.params.callback [as _callback] (D:\nodejs\node_global\node_modules\yarn\lib\cli.js:66988:18)
-      at Request.self.callback (D:\nodejs\node_global\node_modules\yarn\lib\cli.js:140662:22)
-      at Request.emit (events.js:400:28)
-      at Request.<anonymous> (D:\nodejs\node_global\node_modules\yarn\lib\cli.js:141634:10)
-      at Request.emit (events.js:400:28)
-      at IncomingMessage.<anonymous> (D:\nodejs\node_global\node_modules\yarn\lib\cli.js:141556:12)
-      at Object.onceWrapper (events.js:519:28)
-      at IncomingMessage.emit (events.js:412:35)
-      at endReadableNT (internal/streams/readable.js:1334:12)
-      at processTicksAndRejections (internal/process/task_queues.js:82:21)
+  Error: http://registry.npm.taobao.org/@types%2fconnect-multiparty: Not found
+      at Request.params.callback [as _callback] (C:\Users\86180\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:67029:18)
+      at Request.self.callback (C:\Users\86180\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140883:22)
+      at Request.emit (node:events:390:28)
+      at Request.<anonymous> (C:\Users\86180\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141855:10)
+      at Request.emit (node:events:390:28)
+      at IncomingMessage.<anonymous> (C:\Users\86180\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141777:12)
+      at Object.onceWrapper (node:events:509:28)
+      at IncomingMessage.emit (node:events:402:35)
+      at endReadableNT (node:internal/streams/readable:1343:12)
+      at processTicksAndRejections (node:internal/process/task_queues:83:21)
 
 npm manifest: 
   {
@@ -46,6 +46,8 @@ npm manifest:
       "typescript": "^4.5.2"
     },
     "dependencies": {
+      "body-parser": "^1.19.1",
+      "connect-multiparty": "^2.2.0",
       "express": "^4.17.2",
       "mysql": "^2.18.1"
     },
@@ -1601,7 +1603,7 @@ Lockfile:
     resolved "https://registry.npmmirror.com/bignumber.js/download/bignumber.js-9.0.0.tgz#805880f84a329b5eac6e7cb6f8274b6d82bdf075"
     integrity sha1-gFiA+Eoym16sbny2+CdLbYK98HU=
   
-  body-parser@1.19.1:
+  body-parser@1.19.1, body-parser@^1.19.1:
     version "1.19.1"
     resolved "https://registry.npmmirror.com/body-parser/download/body-parser-1.19.1.tgz#1499abbaa9274af3ecc9f6f10396c995943e31d4"
     integrity sha512-8ljfQi5eBk8EJfECMrgqNGWPEY5jWP+1IzkzkGdFFEwFQZZyaZ21UqdaHktgiMlH0xLHqIFtE/u2OYE5dOtViA==
@@ -1779,6 +1781,17 @@ Lockfile:
     version "0.0.1"
     resolved "https://registry.npm.taobao.org/concat-map/download/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
     integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
+  
+  connect-multiparty@^2.2.0:
+    version "2.2.0"
+    resolved "https://registry.npm.taobao.org/connect-multiparty/download/connect-multiparty-2.2.0.tgz#b4932482dba298f82b8a54b70fb60ec5d72393c3"
+    integrity sha1-tJMkgtuimPgrilS3D7YOxdcjk8M=
+    dependencies:
+      http-errors "~1.7.0"
+      multiparty "~4.2.1"
+      on-finished "~2.3.0"
+      qs "~6.5.2"
+      type-is "~1.6.16"
   
   content-disposition@0.5.4:
     version "0.5.4"
@@ -2249,7 +2262,7 @@ Lockfile:
     resolved "https://registry.nlark.com/html-escaper/download/html-escaper-2.0.2.tgz#dfd60027da36a36dfcbe236262c00a5822681453"
     integrity sha1-39YAJ9o2o238viNiYsAKWCJoFFM=
   
-  http-errors@1.8.1:
+  http-errors@1.8.1, http-errors@~1.8.0:
     version "1.8.1"
     resolved "https://registry.npmmirror.com/http-errors/download/http-errors-1.8.1.tgz#7c3f28577cbc8a207388455dbd62295ed07bd68c"
     integrity sha512-Kpk9Sm7NmI+RHhnj6OIWDI1d6fIoFAtFt9RLaTMRlg/8w49juAStsrBgp0Dp4OdxdVbRIeKhtCUvoi/RuAhO4g==
@@ -2259,6 +2272,17 @@ Lockfile:
       setprototypeof "1.2.0"
       statuses ">= 1.5.0 < 2"
       toidentifier "1.0.1"
+  
+  http-errors@~1.7.0:
+    version "1.7.3"
+    resolved "https://registry.npmmirror.com/http-errors/download/http-errors-1.7.3.tgz#6c619e4f9c60308c38519498c14fbb10aacebb06"
+    integrity sha1-bGGeT5xgMIw4UZSYwU+7EKrOuwY=
+    dependencies:
+      depd "~1.1.2"
+      inherits "2.0.4"
+      setprototypeof "1.1.1"
+      statuses ">= 1.5.0 < 2"
+      toidentifier "1.0.0"
   
   http-proxy-agent@^4.0.1:
     version "4.0.1"
@@ -3031,6 +3055,15 @@ Lockfile:
     resolved "https://registry.npmmirror.com/ms/download/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
     integrity sha1-V0yBOM4dK1hh8LRFedut1gxmFbI=
   
+  multiparty@~4.2.1:
+    version "4.2.2"
+    resolved "https://registry.nlark.com/multiparty/download/multiparty-4.2.2.tgz#bee5fb5737247628d39dab4979ffd6d57bf60ef6"
+    integrity sha1-vuX7VzckdijTnatJef/W1Xv2DvY=
+    dependencies:
+      http-errors "~1.8.0"
+      safe-buffer "5.2.1"
+      uid-safe "2.1.5"
+  
   mysql@^2.18.1:
     version "2.18.1"
     resolved "https://registry.npm.taobao.org/mysql/download/mysql-2.18.1.tgz#2254143855c5a8c73825e4522baf2ea021766717"
@@ -3253,6 +3286,16 @@ Lockfile:
     resolved "https://registry.npmmirror.com/qs/download/qs-6.9.6.tgz#26ed3c8243a431b2924aca84cc90471f35d5a0ee"
     integrity sha1-Ju08gkOkMbKSSsqEzJBHHzXVoO4=
   
+  qs@~6.5.2:
+    version "6.5.3"
+    resolved "https://registry.npmmirror.com/qs/download/qs-6.5.3.tgz#3aeeffc91967ef6e35c0e488ef46fb296ab76aad"
+    integrity sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==
+  
+  random-bytes@~1.0.0:
+    version "1.0.0"
+    resolved "https://registry.nlark.com/random-bytes/download/random-bytes-1.0.0.tgz#4f68a1dc0ae58bd3fb95848c30324db75d64360b"
+    integrity sha1-T2ih3Arli9P7lYSMMDJNt11kNgs=
+  
   range-parser@~1.2.1:
     version "1.2.1"
     resolved "https://registry.nlark.com/range-parser/download/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
@@ -3438,6 +3481,11 @@ Lockfile:
       escape-html "~1.0.3"
       parseurl "~1.3.3"
       send "0.17.2"
+  
+  setprototypeof@1.1.1:
+    version "1.1.1"
+    resolved "https://registry.nlark.com/setprototypeof/download/setprototypeof-1.1.1.tgz#7e95acb24aa92f5885e0abef5ba131330d4ae683"
+    integrity sha1-fpWsskqpL1iF4KvvW6ExMw1K5oM=
   
   setprototypeof@1.2.0:
     version "1.2.0"
@@ -3630,6 +3678,11 @@ Lockfile:
     dependencies:
       is-number "^7.0.0"
   
+  toidentifier@1.0.0:
+    version "1.0.0"
+    resolved "https://registry.npmmirror.com/toidentifier/download/toidentifier-1.0.0.tgz?cache=0&sync_timestamp=1636938489272&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Ftoidentifier%2Fdownload%2Ftoidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
+    integrity sha1-fhvjRw8ed5SLxD2Uo8j013UrpVM=
+  
   toidentifier@1.0.1:
     version "1.0.1"
     resolved "https://registry.npmmirror.com/toidentifier/download/toidentifier-1.0.1.tgz?cache=0&sync_timestamp=1636938467744&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Ftoidentifier%2Fdownload%2Ftoidentifier-1.0.1.tgz#3be34321a88a820ed1bd80dfaa33e479fbb8dd35"
@@ -3686,7 +3739,7 @@ Lockfile:
     resolved "https://registry.npmmirror.com/type-fest/download/type-fest-0.21.3.tgz#d260a24b0198436e133fa26a524a6d65fa3b2e37"
     integrity sha1-0mCiSwGYQ24TP6JqUkptZfo7Ljc=
   
-  type-is@~1.6.18:
+  type-is@~1.6.16, type-is@~1.6.18:
     version "1.6.18"
     resolved "https://registry.nlark.com/type-is/download/type-is-1.6.18.tgz#4e552cd05df09467dcbc4ef739de89f2cf37c131"
     integrity sha1-TlUs0F3wlGfcvE73Od6J8s83wTE=
@@ -3705,6 +3758,13 @@ Lockfile:
     version "4.5.4"
     resolved "https://registry.npmmirror.com/typescript/download/typescript-4.5.4.tgz#a17d3a0263bf5c8723b9c52f43c5084edf13c2e8"
     integrity sha512-VgYs2A2QIRuGphtzFV7aQJduJ2gyfTljngLzjpfW9FoYZF6xuw1W0vW9ghCKLfcWrCFxK81CSGRAvS1pn4fIUg==
+  
+  uid-safe@2.1.5:
+    version "2.1.5"
+    resolved "https://registry.nlark.com/uid-safe/download/uid-safe-2.1.5.tgz#2b3d5c7240e8fc2e58f8aa269e5ee49c0857bd3a"
+    integrity sha1-Kz1cckDo/C5Y+Komnl7knAhXvTo=
+    dependencies:
+      random-bytes "~1.0.0"
   
   unicode-canonical-property-names-ecmascript@^2.0.0:
     version "2.0.0"

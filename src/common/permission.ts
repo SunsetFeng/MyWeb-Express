@@ -15,6 +15,10 @@
   */
  export const BLOG = Symbol("BLOG");
  /**
+  * 文件上传权限配置
+  */
+ export const UPLOAD = Symbol("UPLOAD");
+ /**
   * 权限配置
   */
  const permisionConfig = new Map<Symbol,number>([
