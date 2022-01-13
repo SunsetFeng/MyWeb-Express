@@ -9,9 +9,11 @@ import { initPermision } from "./common/permission";
 import { Mgr } from "./common/manager";
 
 //项目根目录
-export const RootDir = path.join(__dirname,"../");
+export const RootDir = process.cwd();
 //app对象
 const app = express();
+//监听端口
+export const port = 8000;
 /**
  * 创建数据库连接对象
  */
@@ -91,7 +93,7 @@ export async function init() {
   //初始化管理器
   Mgr.init();
   //监听8000端口
-  app.listen(8000);
+  app.listen(port);
   console.log("初始化完成");
 }
 //初始化

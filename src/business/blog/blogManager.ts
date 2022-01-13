@@ -1,9 +1,9 @@
 import { createWriteStream, existsSync, WriteStream } from "fs";
-import { rm } from "fs/promises";
+import { readdir, rm } from "fs/promises";
 import path from "path";
-import { RootDir } from "../..";
+import { port, RootDir } from "../..";
 import { ErrorCode } from "../../common/error";
-import { deleteDatabase, generateUUID, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
+import { deleteDatabase, generateUUID, getIPAdress, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
 
 //博客分类数据
 export type BlogCategoryData = {
@@ -27,9 +27,17 @@ type BlogData = {
   title: string,  //名称
   category: string[]  //分类
 }
+/**
+ * 图片资源类型
+ */
+type PictureData = {
+  name: string,
+  url: string
+}
 
 export const DraftDir = "assets/blog/draft";
 export const BlogDir = "assets/blog/content";
+export const BlogPictureDir = "assets/blog/image";
 
 export default class BlogManager {
   //博客管理器---单例
@@ -48,6 +56,8 @@ export default class BlogManager {
   private blogMap = new Map<string, BlogData>();
   //博客分类数据map category => BlogData[]
   private categoryMap = new Map<string, BlogData[]>();
+  //图片资源数组
+  public pictureDatas: Array<PictureData> = [];
 
   constructor() {
     this.init();
@@ -315,7 +325,7 @@ export default class BlogManager {
           writeStream.write(content, (err) => {
             if (err) {
               //写入失败
-              reject([ErrorCode.FileWriteFailure,"更新博客文件失败"]);
+              reject([ErrorCode.FileWriteFailure, "更新博客文件失败"]);
             } else {
               let blogData = this.blogMap.get(id)!;
               //更新分类map
@@ -323,7 +333,7 @@ export default class BlogManager {
               blogData.category = category || blogData.category;
               blogData.title = nextTitle;
               blogData.content = content || blogData.content;
-              this.addToCategory(blogData.category,blogData);
+              this.addToCategory(blogData.category, blogData);
             }
             this.streamMap.delete(id);
             resolve(true);
@@ -338,6 +348,14 @@ export default class BlogManager {
    */
   public getBlogDatasByCatgory(category: string): BlogData[] {
     return this.categoryMap.get(category)!;
+  }
+  /**
+   * 构建图片url
+   * @param fileName 
+   * @returns 
+   */
+  public makePictureAddress(fileName: string) {
+    return `http://${getIPAdress()!}:${port}/${BlogPictureDir}/${fileName}`
   }
   /**
    * 根据id获取博客数据
@@ -373,7 +391,7 @@ export default class BlogManager {
         return val === blogData;
       });
       blogDatas.splice(index, 1);
-      if(blogDatas.length === 0){
+      if (blogDatas.length === 0) {
         this.categoryMap.delete(categorys[i]);
       }
     }
@@ -405,7 +423,7 @@ export default class BlogManager {
           resolve(true);
         })
       }).catch(() => {
-        reject([ErrorCode.DatabaseReadError,"读取草稿数据失败"]);
+        reject([ErrorCode.DatabaseReadError, "读取草稿数据失败"]);
       })
     })
   }
@@ -442,7 +460,27 @@ export default class BlogManager {
           resolve(true);
         })
       }).catch(() => {
-        reject([ErrorCode.DatabaseReadError,"读取博客数据失败"]);
+        reject([ErrorCode.DatabaseReadError, "读取博客数据失败"]);
+      })
+    })
+  }
+  /**
+   * 初始化博客图片资源数据
+   */
+  private readBlogPicture(): Promise<boolean> {
+    return new Promise((resovle, reject) => {
+      let dirPath = path.join(RootDir, BlogPictureDir);
+      readdir(dirPath).then(res => {
+        for (let i = 0; i < res.length; i++) {
+          this.pictureDatas.push({
+            name: res[i],
+            url: this.makePictureAddress(res[i])
+          })
+        }
+        resovle(true);
+        console.log("图片资源初始化完成");
+      }).catch(err => {
+
       })
     })
   }
@@ -452,5 +490,6 @@ export default class BlogManager {
   private init() {
     this.readDraftData(); //读取草稿数据
     this.readBlogData(); //读取博客数据
+    this.readBlogPicture(); //读物博客图片资源
   }
 }

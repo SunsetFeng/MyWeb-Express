@@ -1,7 +1,14 @@
+import multiparty from 'multiparty';
 import express from "express";
+import { existsSync, mkdirSync } from "fs";
+import path from "path";
+import { port, RootDir } from "../..";
 import { ErrorCode, makeErrorMsg } from "../../common/error";
 import { Mgr } from "../../common/manager";
 import { BLOG, checkPermision } from "../../common/permission";
+import { rename, rm } from 'fs/promises';
+import { getIPAdress } from '../../common/util';
+import { BlogPictureDir } from '../../business/blog/blogManager';
 //草稿操作
 enum DraftOperaType {
   SAVE,
@@ -134,4 +141,60 @@ blogRouter.post("/content", function (req, res) {
   let id = req.body.id;
   let data = Mgr.blogMgr.getBlogDataById(id);
   res.end(JSON.stringify(data));
+})
+/**
+ * 博客图片上传
+ */
+blogRouter.post("/upload", function (req, res) {
+
+  let dirPath = path.join(RootDir, BlogPictureDir);
+  if (!existsSync(dirPath)) {
+    mkdirSync(dirPath);
+  }
+
+  let form = new multiparty.Form({
+    uploadDir: dirPath
+  });
+
+  form.parse(req, function (err, fields, files) {
+    if (err) {
+      res.end(makeErrorMsg(ErrorCode.ParamError));
+    } else {
+      let file = files.file[0];
+      let uploadedPath = file.path;
+      let realPath = path.join(dirPath, file.originalFilename);
+      if (existsSync(realPath)) {
+        //已经存在 失败
+        res.end(makeErrorMsg(ErrorCode.ParamError, "重复的名称"));
+        //移除
+        rm(uploadedPath);
+        return;
+      }
+      rename(uploadedPath, realPath).then(() => {
+        let url = Mgr.blogMgr.makePictureAddress(file.originalFilename);
+        Mgr.blogMgr.pictureDatas.push({
+          url,
+          name: file.originalFilename
+        })
+        res.end(JSON.stringify({
+          status: true,
+          url,
+          name: file.originalFilename
+        }))
+      }).catch((err) => {
+        res.end(JSON.stringify({
+          status: false,
+          msg: err
+        }))
+      })
+    }
+  })
+
+})
+/**
+ * 获取博客图片资源
+ */
+blogRouter.post("/pictures", function (req, res) {
+  let datas = Mgr.blogMgr.pictureDatas;
+  res.end(JSON.stringify(datas));
 })

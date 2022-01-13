@@ -1,11 +1,9 @@
 import { Router } from "express";
 import path from "path";
 import { RootDir } from "..";
-import { ErrorCode, makeErrorMsg } from "../common/error";
 import { getPermission, UPLOAD } from "../common/permission";
-import multiparty from "multiparty";
-import { rename } from "fs/promises";
-import os from "os";
+import { readFile, rename, rm } from "fs/promises";
+import { existsSync, mkdirSync } from "fs";
 
 
 export * from "./application/blog";
@@ -28,6 +26,20 @@ appRouter.all("*", function (req, res, next) {
     next();
   }
 })
+//所有请求都判断是不是获取静态文件,如果是,则直接返回文件
+appRouter.use("/", function (req, res, next) {
+  let url = req.url;
+  let filePath = path.join(RootDir, url);
+  let method = req.method.toLowerCase();
+  if (method === "get" && existsSync(filePath)) {
+    //如果存在
+    readFile(filePath).then(data => {
+      res.end(data);
+    })
+  } else {
+    next();
+  }
+})
 
 appRouter.post("/permission", function (req, res) {
   let body: { flag: string } = req.body;
@@ -37,38 +49,5 @@ appRouter.post("/permission", function (req, res) {
   }))
 })
 
-
-
-appRouter.post("/upload", function (req, res) {
-
-  let dirPath = path.join(RootDir, "assets/blog/image/");
-
-  let form = new multiparty.Form({
-    uploadDir: dirPath
-  });
-  form.parse(req, function (err, fields, files) {
-    if (err) {
-      res.end(makeErrorMsg(ErrorCode.ParamError));
-    }else{
-      let file = files.file[0];
-      let uploadedPath  = file.path;
-      let realPath = path.join(dirPath,file.originalFilename);
-      rename(uploadedPath,realPath).then(() =>{
-
-        console.log(os.networkInterfaces());
-        res.end(JSON.stringify({
-          status:true,
-
-        }))
-      }).catch(() => {
-        res.end(JSON.stringify({
-          status:false,
-          msg:"上传失败"
-        }))
-      })
-    }
-  })
-
-})
 
 export default appRouter;
