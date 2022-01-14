@@ -1,13 +1,12 @@
 import multiparty from 'multiparty';
 import express from "express";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync } from "fs";
 import path from "path";
 import { port, RootDir } from "../..";
 import { ErrorCode, makeErrorMsg } from "../../common/error";
 import { Mgr } from "../../common/manager";
 import { BLOG, checkPermision } from "../../common/permission";
 import { rename, rm } from 'fs/promises';
-import { getIPAdress } from '../../common/util';
 import { BlogPictureDir } from '../../business/blog/blogManager';
 //草稿操作
 enum DraftOperaType {
@@ -148,10 +147,6 @@ blogRouter.post("/content", function (req, res) {
 blogRouter.post("/upload", function (req, res) {
 
   let dirPath = path.join(RootDir, BlogPictureDir);
-  if (!existsSync(dirPath)) {
-    mkdirSync(dirPath);
-  }
-
   let form = new multiparty.Form({
     uploadDir: dirPath
   });

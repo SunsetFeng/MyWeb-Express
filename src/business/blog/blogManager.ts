@@ -1,4 +1,4 @@
-import { createWriteStream, existsSync, WriteStream } from "fs";
+import { createWriteStream, existsSync, mkdirSync, WriteStream } from "fs";
 import { readdir, rm } from "fs/promises";
 import path from "path";
 import { port, RootDir } from "../..";
@@ -470,6 +470,9 @@ export default class BlogManager {
   private readBlogPicture(): Promise<boolean> {
     return new Promise((resovle, reject) => {
       let dirPath = path.join(RootDir, BlogPictureDir);
+      if (!existsSync(dirPath)) {
+        mkdirSync(dirPath);
+      }
       readdir(dirPath).then(res => {
         for (let i = 0; i < res.length; i++) {
           this.pictureDatas.push({
@@ -480,7 +483,7 @@ export default class BlogManager {
         resovle(true);
         console.log("图片资源初始化完成");
       }).catch(err => {
-
+        console.log(err);
       })
     })
   }
