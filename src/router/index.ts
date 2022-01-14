@@ -1,9 +1,9 @@
 import { Router } from "express";
 import path from "path";
 import { RootDir } from "..";
-import { getPermission, UPLOAD } from "../common/permission";
-import { readFile, rename, rm } from "fs/promises";
-import { existsSync, mkdirSync } from "fs";
+import { getPermission } from "../common/permission";
+import { readFile,  } from "fs/promises";
+import { existsSync } from "fs";
 
 
 export * from "./application/blog";
@@ -28,7 +28,7 @@ appRouter.all("*", function (req, res, next) {
 })
 //所有请求都判断是不是获取静态文件,如果是,则直接返回文件
 appRouter.use("/", function (req, res, next) {
-  let url = req.url;
+  let url = decodeURIComponent(req.url);
   let filePath = path.join(RootDir, url);
   let method = req.method.toLowerCase();
   if (method === "get" && existsSync(filePath)) {
