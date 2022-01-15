@@ -1,9 +1,9 @@
 import { createWriteStream, existsSync, mkdirSync, WriteStream } from "fs";
 import { readdir, rm } from "fs/promises";
 import path from "path";
-import { port, RootDir } from "../..";
+import { address, port, RootDir } from "../..";
 import { ErrorCode } from "../../common/error";
-import { deleteDatabase, generateUUID, getIPAdress, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
+import { deleteDatabase, generateUUID, insetLineToDatabase, queryFromDatabase, readFileContent, updateDatabase } from "../../common/util";
 
 //博客分类数据
 export type BlogCategoryData = {
@@ -355,7 +355,7 @@ export default class BlogManager {
    * @returns 
    */
   public makePictureAddress(fileName: string) {
-    return `http://${getIPAdress()!}:${port}/${BlogPictureDir}/${fileName}`
+    return `http://${address}:${port}/${BlogPictureDir}/${fileName}`
   }
   /**
    * 根据id获取博客数据

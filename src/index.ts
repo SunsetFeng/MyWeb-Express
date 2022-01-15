@@ -14,6 +14,8 @@ export const RootDir = process.cwd();
 const app = express();
 //监听端口
 export const port = 8000;
+//环境
+export const address = process.env.NODE_ENV === "production" ? "120.79.172.129" : "127.0.0.1";
 /**
  * 创建数据库连接对象
  */
