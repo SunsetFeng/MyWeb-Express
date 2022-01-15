@@ -25,6 +25,7 @@ type BlogData = {
   id: string, //id
   content: string,  //内容
   title: string,  //名称
+  time: string,  //发布时间
   category: string[]  //分类
 }
 /**
@@ -210,10 +211,11 @@ export default class BlogManager {
         if (!id) {
           id = generateUUID();
         }
-        await insetLineToDatabase<{ id: string, title: string, category: string }>({
+        let time = Date.now().toString();
+        await insetLineToDatabase<{ id: string, title: string, category: string, time: string }>({
           table: "blog_content",
-          fields: ["id", "title", "category"],
-          values: [id, title, category.toString()]
+          fields: ["id", "title", "category", "time"],
+          values: [id, title, category.toString(), time]
         }).catch(() => {
           return reject([ErrorCode.DatabaseWriteError, "保存博客失败"])
         });
@@ -238,7 +240,8 @@ export default class BlogManager {
               id: id!,
               title,
               content,
-              category
+              category,
+              time
             }
             //添加到博客map
             this.blogMap.set(id!, blogData);
@@ -432,7 +435,7 @@ export default class BlogManager {
    */
   private readBlogData(): Promise<Boolean> {
     return new Promise((resolve, reject) => {
-      queryFromDatabase<{ id: string, title: string, category: string }>({
+      queryFromDatabase<{ id: string, title: string, category: string, time: string }>({
         table: "blog_content",
         fields: '*',
       }).then(res => {
