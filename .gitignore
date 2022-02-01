@@ -2,3 +2,5 @@ node_modules
 coverage
 assets
 dist
+.vscode
+pm2.json

@@ -7,7 +7,7 @@ function connectMysql(database?: string) {
   let base = {
     host: "localhost",
     user: "root",
-    password: "423305",
+    password: process.env.DATABASE,
   }
   if (database) {
     base = Object.assign(base, {

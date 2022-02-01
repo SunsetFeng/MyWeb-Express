@@ -186,6 +186,9 @@ blogRouter.post("/upload", function (req, res) {
   })
 
 })
+/**
+ * 删除图片接口
+ */
 blogRouter.post("/permission/deletePicture",function(req,res){
   let name = req.body.name;
   let index = Mgr.blogMgr.pictureDatas.findIndex(item => {
