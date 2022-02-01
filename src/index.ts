@@ -1,4 +1,3 @@
-import mysql from "mysql";
 import express from "express";
 import path from "path";
 import { promises } from "fs";
@@ -7,6 +6,8 @@ import bodyParser from "body-parser";
 import { BlogDir, DraftDir } from "./business/blog/blogManager";
 import { initPermision } from "./common/permission";
 import { Mgr } from "./common/manager";
+import { initMysql } from "./common/mysql";
+import { Connection } from "mysql";
 
 //项目根目录
 export const RootDir = process.cwd();
@@ -15,34 +16,8 @@ const app = express();
 //监听端口
 export const port = 8000;
 //环境
-export const address = process.env.NODE_ENV === "production" ? "120.79.172.129" : "127.0.0.1";
-/**
- * 创建数据库连接对象
- */
-const dataConnection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "423305",
-  database: "web"
-});
-/**
- * 连接mysql
- * @returns 
- */
-async function initMysql() {
-  return new Promise((resolve, reject) => {
-    dataConnection.connect((err) => {
-      if (err) {
-        reject("数据库连接失败:" + err.message);
-      } else {
-        resolve(true);
-      }
-    });
-  }).catch((err) => {
-    console.error(err);
-    process.exit(1);
-  })
-}
+export const address = process.env.NODE_ENV === "production" ? "qy-lrr-home.cn" : "127.0.0.1";
+
 /**
  * 初始化文件夹
  * @returns 
@@ -100,5 +75,3 @@ export async function init() {
 }
 //初始化
 init();
-//数据库连接对象
-export default dataConnection;

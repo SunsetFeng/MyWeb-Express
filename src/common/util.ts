@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import { networkInterfaces } from "os";
-import dataConnection from "..";
 import { ErrorCode } from "./error";
+import dataConnection from "./mysql";
 
 /**
  * 获取UUID

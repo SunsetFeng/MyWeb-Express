@@ -186,6 +186,24 @@ blogRouter.post("/upload", function (req, res) {
   })
 
 })
+blogRouter.post("/permission/deletePicture",function(req,res){
+  let name = req.body.name;
+  let index = Mgr.blogMgr.pictureDatas.findIndex(item => {
+    return item.name === name
+  })
+  if(index > -1){
+    Mgr.blogMgr.pictureDatas.splice(index,1);
+  }
+  let filePath = path.join(RootDir,BlogPictureDir,name);
+  rm(filePath).then(() => {
+    res.end(JSON.stringify({
+      name,
+      status:true,
+    }))
+  }).catch(err => {
+    res.end(makeErrorMsg(ErrorCode.FileDeleteFailure));
+  })
+})
 /**
  * 获取博客图片资源
  */

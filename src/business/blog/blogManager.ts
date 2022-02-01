@@ -94,7 +94,7 @@ export default class BlogManager {
             fields: ["id", "title"],
             values: [id, title]
           }).catch(() => {
-            return reject([ErrorCode.DatabaseReadError, "写入草稿失败"])
+            return reject([ErrorCode.DatabaseWriteError, "写入草稿失败"])
           })
         } else {
           if (!this.draftMap.has(id)) {
@@ -106,7 +106,7 @@ export default class BlogManager {
             values: [title],
             condition: `id='${id}'`
           }).catch(err => {
-            return reject([ErrorCode.DatabaseReadError, "更新草稿失败"])
+            return reject([ErrorCode.DatabaseWriteError, "更新草稿失败"])
           })
         }
         let filePath = path.join(RootDir, DraftDir, `${id}.md`);
@@ -474,7 +474,9 @@ export default class BlogManager {
     return new Promise((resovle, reject) => {
       let dirPath = path.join(RootDir, BlogPictureDir);
       if (!existsSync(dirPath)) {
-        mkdirSync(dirPath);
+        mkdirSync(dirPath,{
+          recursive:true
+        });
       }
       readdir(dirPath).then(res => {
         for (let i = 0; i < res.length; i++) {
