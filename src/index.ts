@@ -7,7 +7,6 @@ import { BlogDir, DraftDir } from "./business/blog/blogManager";
 import { initPermision } from "./common/permission";
 import { Mgr } from "./common/manager";
 import { initMysql } from "./common/mysql";
-import { Connection } from "mysql";
 
 //项目根目录
 export const RootDir = process.cwd();

@@ -49,7 +49,9 @@ export async function initPermision() {
  */
 export function checkPermision(flag: string, func: Symbol): boolean {
   let level = permisionMap.get(flag) || 0;
-  if (level < (permisionConfig.get(func) || 0)) {
+  let needLe = permisionConfig.get(func);
+  if (level < (needLe || 0)) {
+    console.log(`permission error: cur:${level},need:${needLe}`);
     return false
   } else {
     return true;
