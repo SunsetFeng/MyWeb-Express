@@ -1,5 +1,4 @@
 import { readFile } from "fs/promises";
-import { networkInterfaces } from "os";
 import { ErrorCode } from "./error";
 import dataConnection from "./mysql";
 
@@ -86,9 +85,9 @@ export function insetLineToDatabase<T extends Record<string, any>>(option: {
   let valStr = "";
   values.forEach((val, index) => {
     if (index === 0) {
-      valStr += val ? `'${val}'` : "null";
+      valStr += val !== null ? `'${val}'` : "null";
     } else {
-      valStr += val ? `,'${val}'` : ",null";
+      valStr += val !== null ? `,'${val}'` : ",null";
     }
   })
   return new Promise((resolve, reject) => {

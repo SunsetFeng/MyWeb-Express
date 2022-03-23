@@ -2,7 +2,7 @@ import multiparty from 'multiparty';
 import express from "express";
 import { existsSync } from "fs";
 import path from "path";
-import { port, RootDir } from "../..";
+import { RootDir } from "../..";
 import { ErrorCode, makeErrorMsg } from "../../common/error";
 import { Mgr } from "../../common/manager";
 import { BLOG, checkPermision } from "../../common/permission";

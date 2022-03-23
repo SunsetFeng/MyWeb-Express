@@ -427,7 +427,7 @@ export default class BlogManager {
         })
       }).catch(() => {
         reject([ErrorCode.DatabaseReadError, "读取草稿数据失败"]);
-      })
+      });
     })
   }
   /**

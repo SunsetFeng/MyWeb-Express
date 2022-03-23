@@ -1,4 +1,5 @@
 import mysql, { Connection } from "mysql";
+import { insetLineToDatabase } from "./util";
 type CreateTableFunc = (resolve: (value: boolean) => void, reject: (reason: any) => void) => void
 /**
  * 创建数据库连接对象
@@ -69,10 +70,29 @@ const createBlogTable: CreateTableFunc = function (resolve, reject) {
     }
   })
 }
+/**
+ * 创建note表
+ */
+const createNoteTable:CreateTableFunc = function(resolve,reject){
+  dataConnection.query({
+    sql: `Create Table If Not Exists note(
+      id int Primary Key Not Null,
+      label varchar(255) Not Null,
+      parent int
+    )Charset=utf8`
+  },(err) => {
+    if(err){
+      reject(err);
+    }else{
+      resolve(true);
+    }
+  })
+}
+
 //执行队列
 const createQueue: CreateTableFunc[] = [];
 const createQueuePromise: Promise<boolean>[] = [];
-createQueue.push(createBlogTable,createDraftTable,createPermissionTable);
+createQueue.push(createBlogTable,createDraftTable,createPermissionTable,createNoteTable);
 /**
  * 执行队列转换成Promise返回
  * @param fn 
@@ -114,12 +134,22 @@ export async function initMysql() {
           for (let i = 0; i < createQueue.length; i++) {
             createQueuePromise.push(promiseUtilFunc(createQueue[i]));
           }
-          Promise.all(createQueuePromise).then(res => {
+          Promise.all(createQueuePromise).then(async res => {
+            await insetLineToDatabase({
+              table:"permission",
+              fields:["flag","level"],
+              values:["211120","7"]
+            }).catch(err => {})
+            await insetLineToDatabase({
+              table:"note",
+              fields:["id","label","parent"],
+              values:[0,"学习笔记",null]
+            }).catch(err =>{})
             resolve(dataConnection);
           }).catch(err => {
             reject(err);
           })
-        })
+        });
       })
     });
   }).catch((err) => {
